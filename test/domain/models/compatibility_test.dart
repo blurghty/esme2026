@@ -4,7 +4,10 @@ import 'package:esme26/data/repositories/user_repository.dart';
 import 'package:esme26/data/repositories/user_repository_JP.dart';
 import 'package:esme26/data/repositories/user_repository_impl.dart';
 import 'package:esme26/main.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUp(() {
@@ -45,16 +48,23 @@ void main() {
     }
   });
 
-  testWidgets('existing home screen still displays the repository user', (
+  testWidgets('the app opens onboarding and home shows the repository user', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
     final user = UserRepository.instance.me()!;
-    await tester.pumpWidget(const MyApp());
-    expect(find.text('Onboarding'), findsOneWidget);
-    expect(
-      find.text('User enrolled: ${user.firstName} ${user.lastName}'),
-      findsOneWidget,
+    await tester.pumpWidget(
+      MyApp(preferences: preferences, userRepository: UserRepository.instance),
     );
+    await tester.pumpAndSettle();
+    expect(find.text('Je suis particulier'), findsOneWidget);
+
+    GoRouter.of(tester.element(find.byType(Scaffold).first)).go('/homepage');
+    // The offline map keeps loading in the background: do not wait for it.
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Bienvenue ${user.firstName} !'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
