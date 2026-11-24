@@ -140,6 +140,18 @@ void main() {
     }
   });
 
+  test('published requests give artisans varied content to browse', () {
+    final open = WorkRequestRepository.instance.getAll().where((request) => request.status == WorkRequestStatus.published).toList();
+    expect(open.length, greaterThanOrEqualTo(6));
+    expect({for (final request in open) request.customerId}.length, greaterThanOrEqualTo(3));
+    expect({for (final request in open) ...request.tradeIds}.length, greaterThanOrEqualTo(5));
+    expect({for (final request in open) request.urgency}, WorkUrgency.values.toSet());
+    for (final request in open) {
+      expect(QuoteRepository.instance.getAll().where((quote) => quote.workRequestId == request.id), isEmpty);
+      expect(request.updatedAt.isBefore(request.createdAt), isFalse);
+    }
+  });
+
   test('invoices, payments and refunds reconcile with the jobs', () {
     for (final invoice in InvoiceRepository.instance.getAll()) {
       final job = JobRepository.instance.getById(invoice.jobId)!;

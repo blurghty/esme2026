@@ -69,6 +69,43 @@ aucun reseau.
 - Donnees OpenStreetMap sous licence ODbL : conserver l'attribution
   « © OpenStreetMap contributors » affichee sur la carte.
 
+## Demandes de projet
+
+L'accueil affiche, au-dessus de la carte, un raccourci selon le role :
+
+- Particulier : « Mes demandes de projet » (`/my-requests`) liste ses demandes
+  et leur statut ; « Nouvelle demande » (`/requests/new`) ouvre le formulaire
+  (titre, description, corps de metier, logement, delai, adresse, budget
+  facultatif). La demande est publiee pour l'utilisateur courant
+  (`UserRepository.me()`) ; la ville et le code postal sont pre-remplis.
+- Artisan : « Demandes de projet » (`/requests`) liste les demandes publiees,
+  les plus recentes d'abord, filtrables par metier (un metier parent inclut
+  ses specialites, ex. Peinture -> Peinture interieure).
+- Le detail d'une demande est sur `/requests/:id` ; seuls la ville et le code
+  postal sont affiches, jamais la rue.
+
+Code : regles pures dans
+[`lib/domain/work_requests/`](lib/domain/work_requests/) (`WorkRequestDraft`,
+`TradeCatalog`, `WorkRequestQueries`), controleurs dans `lib/application/`
+(`WorkRequestBoardController`, `CustomerWorkRequestsController`,
+`WorkRequestFormController`, `WorkRequestDetailsController`), pages dans
+`lib/ui/pages/` et widgets dans
+[`lib/ui/widgets/work_requests/`](lib/ui/widgets/work_requests/).
+
+Les demandes restent en memoire (`WorkRequestRepository.instance`) : une demande
+creee est visible des artisans jusqu'au redemarrage de l'application. Les mocks
+contiennent 8 demandes publiees en Ile-de-France (plomberie, peinture,
+electricite, menuiserie, carrelage, maconnerie ; urgences variees) et, pour
+`customer-1`, des demandes terminee, attribuee et annulee.
+
+Parcours complet sur emulateur ou appareil, avec captures dans
+`build/screenshots/` :
+
+```bash
+flutter drive --driver=test_driver/integration_test.dart \
+  --target=integration_test/work_requests_test.dart -d <device-id>
+```
+
 ## Modeles metier : particuliers et artisans
 
 Les classes sont dans [`lib/domain/models/`](lib/domain/models/).

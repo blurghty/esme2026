@@ -26,14 +26,78 @@ class MockData {
     roles: {UserRole.artisan},
     createdAt: createdAt,
   );
-  static final List<User> users = List.unmodifiable([customer, artisan]);
+  static final versaillesAdress = Adress(
+    street: '14 rue des Tilleuls',
+    city: 'Versailles',
+    postalCode: '78000',
+    country: 'France',
+    location: GeoPoint(latitude: 48.8049, longitude: 2.1204),
+  );
+  static final montreuilAdress = Adress(
+    street: '5 rue des Vergers',
+    city: 'Montreuil',
+    postalCode: '93100',
+    country: 'France',
+    location: GeoPoint(latitude: 48.8638, longitude: 2.4485),
+  );
+  static final boulogneAdress = Adress(
+    street: '22 avenue des Platanes',
+    city: 'Boulogne-Billancourt',
+    postalCode: '92100',
+    country: 'France',
+    location: GeoPoint(latitude: 48.8397, longitude: 2.2399),
+  );
+  static final sophie = User(
+    id: 'customer-2',
+    firstName: 'Sophie',
+    lastName: 'Bernard',
+    email: 'sophie@example.test',
+    birthDateInMillisFromEpoch: DateTime.utc(
+      1985,
+      4,
+      12,
+    ).millisecondsSinceEpoch,
+    adress: versaillesAdress,
+    createdAt: DateTime.utc(2026, 11, 2, 9),
+  );
+  static final karim = User(
+    id: 'customer-3',
+    firstName: 'Karim',
+    lastName: 'Haddad',
+    email: 'karim@example.test',
+    birthDateInMillisFromEpoch: DateTime.utc(1992, 9, 3).millisecondsSinceEpoch,
+    adress: montreuilAdress,
+    createdAt: DateTime.utc(2026, 11, 5, 18),
+  );
+  static final lea = User(
+    id: 'customer-4',
+    firstName: 'Léa',
+    lastName: 'Martin',
+    email: 'lea@example.test',
+    birthDateInMillisFromEpoch: DateTime.utc(
+      1978,
+      1,
+      30,
+    ).millisecondsSinceEpoch,
+    adress: boulogneAdress,
+    createdAt: DateTime.utc(2026, 11, 10, 12),
+  );
+  static final List<User> users = List.unmodifiable([customer, artisan, sophie, karim, lea]);
 
   static final List<CustomerProfile> customerProfiles = List.unmodifiable([
     const CustomerProfile(userId: 'customer-1', presentation: 'Particulier souhaitant renover son logement.'),
+    const CustomerProfile(userId: 'customer-2', presentation: 'Propriétaire d’une maison avec jardin à Versailles.'),
+    const CustomerProfile(userId: 'customer-3', presentation: 'Jeune parent qui aménage son appartement.'),
+    const CustomerProfile(userId: 'customer-4', presentation: 'Rénovation progressive d’un appartement ancien.'),
   ]);
   static final List<Trade> trades = List.unmodifiable([
     const Trade(id: 'trade-painting', name: 'Peinture'),
-    const Trade(id: 'trade-interior-painting', name: 'Peinture interieure', parentTradeId: 'trade-painting'),
+    const Trade(id: 'trade-interior-painting', name: 'Peinture intérieure', parentTradeId: 'trade-painting'),
+    const Trade(id: 'trade-plumbing', name: 'Plomberie'),
+    const Trade(id: 'trade-electricity', name: 'Électricité'),
+    const Trade(id: 'trade-carpentry', name: 'Menuiserie'),
+    const Trade(id: 'trade-tiling', name: 'Carrelage'),
+    const Trade(id: 'trade-masonry', name: 'Maçonnerie'),
   ]);
   static final List<ArtisanProfile> artisanProfiles = List.unmodifiable([
     ArtisanProfile(
@@ -92,7 +156,17 @@ class MockData {
     sizeInBytes: 40000,
     createdAt: DateTime.utc(2026, 10, 5, 17),
   );
-  static final List<Attachment> attachments = List.unmodifiable([requestPhoto, portfolioPhoto, insuranceFile, invoiceFile]);
+  static final bathroomPhoto = Attachment(
+    id: 'attachment-bathroom',
+    uploadedByUserId: 'customer-2',
+    fileName: 'salle-de-bain-actuelle.jpg',
+    mimeType: 'image/jpeg',
+    url: Uri.parse('https://media.example.test/salle-de-bain-actuelle.jpg'),
+    kind: AttachmentKind.image,
+    sizeInBytes: 210000,
+    createdAt: DateTime.utc(2026, 11, 22, 18),
+  );
+  static final List<Attachment> attachments = List.unmodifiable([requestPhoto, portfolioPhoto, insuranceFile, invoiceFile, bathroomPhoto]);
   static final List<ProfessionalDocument> professionalDocuments = List.unmodifiable([
     ProfessionalDocument(
       id: 'document-insurance',
@@ -126,7 +200,7 @@ class MockData {
       id: 'request-1',
       customerId: 'customer-1',
       title: 'Repeindre le salon',
-      description: 'Peinture blanche sur 20 metres carres de murs.',
+      description: 'Peinture blanche sur 20 mètres carrés de murs, plafond compris.',
       tradeIds: {'trade-interior-painting'},
       adress: adress,
       propertyType: PropertyType.apartment,
@@ -141,7 +215,7 @@ class MockData {
       id: 'request-2',
       customerId: 'customer-1',
       title: 'Repeindre la cuisine',
-      description: 'Preparation et peinture des murs de la cuisine.',
+      description: 'Préparation et peinture des murs de la cuisine, teinte vert d’eau.',
       tradeIds: {'trade-interior-painting'},
       adress: adress,
       propertyType: PropertyType.apartment,
@@ -151,6 +225,193 @@ class MockData {
       preferredPeriod: secondPeriod,
       createdAt: createdAt,
       updatedAt: DateTime.utc(2026, 10, 2),
+    ),
+    // Published requests open to artisans (Ile-de-France), newest last.
+    WorkRequest(
+      id: 'request-3',
+      customerId: 'customer-2',
+      title: 'Muret de clôture dans le jardin',
+      description: 'Construction d’un muret en parpaings enduits de 12 m de long et 80 cm de haut, en limite de propriété. Accès facile par le portail.',
+      tradeIds: {'trade-masonry'},
+      adress: versaillesAdress,
+      propertyType: PropertyType.house,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 300000),
+        maximum: Money(minorUnits: 500000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2027, 3, 1, 8),
+        endsAt: DateTime.utc(2027, 3, 31, 17),
+      ),
+      createdAt: DateTime.utc(2026, 11, 16, 11, 30),
+      updatedAt: DateTime.utc(2026, 11, 16, 11, 30),
+    ),
+    WorkRequest(
+      id: 'request-4',
+      customerId: 'customer-1',
+      title: 'Rafraîchir les peintures du couloir',
+      description: 'Couloir de 8 m de long avec des traces et des éclats sur les murs. Lessivage, reprise des enduits puis peinture satinée claire.',
+      tradeIds: {'trade-painting'},
+      adress: adress,
+      propertyType: PropertyType.apartment,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 50000),
+        maximum: Money(minorUnits: 90000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2026, 12, 1, 8),
+        endsAt: DateTime.utc(2026, 12, 19, 17),
+      ),
+      createdAt: DateTime.utc(2026, 11, 18, 16),
+      updatedAt: DateTime.utc(2026, 11, 18, 16),
+    ),
+    WorkRequest(
+      id: 'request-5',
+      customerId: 'customer-3',
+      title: 'Bibliothèque sur mesure dans le salon',
+      description: 'Création d’une bibliothèque en chêne massif sur un mur de 3,5 m, avec niches ouvertes en haut et placards fermés en bas.',
+      tradeIds: {'trade-carpentry'},
+      adress: montreuilAdress,
+      propertyType: PropertyType.apartment,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 200000),
+        maximum: Money(minorUnits: 350000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2027, 2, 1, 8),
+        endsAt: DateTime.utc(2027, 2, 26, 17),
+      ),
+      createdAt: DateTime.utc(2026, 11, 19, 9, 20),
+      updatedAt: DateTime.utc(2026, 11, 19, 9, 20),
+    ),
+    WorkRequest(
+      id: 'request-6',
+      customerId: 'customer-4',
+      title: 'Mise aux normes du tableau électrique',
+      description: 'Tableau d’origine des années 80 avec fusibles, à remplacer par un tableau à disjoncteurs. Appartement de 65 m² au 3e étage sans ascenseur.',
+      tradeIds: {'trade-electricity'},
+      adress: boulogneAdress,
+      propertyType: PropertyType.apartment,
+      urgency: WorkUrgency.scheduled,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 150000),
+        maximum: Money(minorUnits: 250000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2026, 12, 7, 8),
+        endsAt: DateTime.utc(2026, 12, 11, 17),
+      ),
+      createdAt: DateTime.utc(2026, 11, 20, 14, 45),
+      updatedAt: DateTime.utc(2026, 11, 20, 14, 45),
+    ),
+    WorkRequest(
+      id: 'request-7',
+      customerId: 'customer-3',
+      title: 'Peinture d’une chambre d’enfant',
+      description: 'Chambre de 12 m² : rebouchage de quelques fissures, sous-couche et deux couches de peinture mate. Plafond blanc, murs vert sauge.',
+      tradeIds: {'trade-interior-painting'},
+      adress: montreuilAdress,
+      propertyType: PropertyType.apartment,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 80000),
+        maximum: Money(minorUnits: 120000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2026, 12, 14, 8),
+        endsAt: DateTime.utc(2026, 12, 23, 17),
+      ),
+      createdAt: DateTime.utc(2026, 11, 21, 10),
+      updatedAt: DateTime.utc(2026, 11, 21, 10),
+    ),
+    WorkRequest(
+      id: 'request-8',
+      customerId: 'customer-2',
+      title: 'Rénovation complète de la salle de bain',
+      description: 'Remplacement de la baignoire par une douche à l’italienne, faïence murale et nouveau carrelage au sol. Salle de bain de 6 m² à l’étage.',
+      tradeIds: {'trade-plumbing', 'trade-tiling'},
+      adress: versaillesAdress,
+      propertyType: PropertyType.house,
+      urgency: WorkUrgency.scheduled,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 700000),
+        maximum: Money(minorUnits: 1000000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2027, 1, 11, 8),
+        endsAt: DateTime.utc(2027, 1, 29, 17),
+      ),
+      attachments: [bathroomPhoto],
+      createdAt: DateTime.utc(2026, 11, 22, 18, 10),
+      updatedAt: DateTime.utc(2026, 11, 22, 18, 10),
+    ),
+    WorkRequest(
+      id: 'request-9',
+      customerId: 'customer-1',
+      title: 'Fuite sous l’évier de la cuisine',
+      description: 'De l’eau goutte sous l’évier depuis deux jours, probablement au niveau du siphon. Il faudrait remplacer le joint ou le siphon.',
+      tradeIds: {'trade-plumbing'},
+      adress: adress,
+      propertyType: PropertyType.apartment,
+      urgency: WorkUrgency.urgent,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 10000),
+        maximum: Money(minorUnits: 25000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2026, 11, 25, 8),
+        endsAt: DateTime.utc(2026, 11, 27, 18),
+      ),
+      createdAt: DateTime.utc(2026, 11, 23, 8, 30),
+      updatedAt: DateTime.utc(2026, 11, 23, 8, 30),
+    ),
+    WorkRequest(
+      id: 'request-10',
+      customerId: 'customer-4',
+      title: 'Remplacement d’un chauffe-eau en panne',
+      description: 'Chauffe-eau électrique de 200 L en panne, à remplacer à l’identique dans le placard de la buanderie. Plus d’eau chaude depuis hier.',
+      tradeIds: {'trade-plumbing'},
+      adress: boulogneAdress,
+      propertyType: PropertyType.apartment,
+      urgency: WorkUrgency.urgent,
+      status: WorkRequestStatus.published,
+      budget: Budget(
+        minimum: Money(minorUnits: 120000),
+        maximum: Money(minorUnits: 180000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2026, 11, 25, 8),
+        endsAt: DateTime.utc(2026, 11, 28, 18),
+      ),
+      createdAt: DateTime.utc(2026, 11, 24, 7, 15),
+      updatedAt: DateTime.utc(2026, 11, 24, 7, 15),
+    ),
+    // Cancelled by its customer: visible in their list, not to artisans.
+    WorkRequest(
+      id: 'request-11',
+      customerId: 'customer-1',
+      title: 'Pose de parquet dans la chambre',
+      description: 'Pose d’un parquet flottant en chêne sur 14 m², projet reporté à l’année prochaine.',
+      tradeIds: {'trade-carpentry'},
+      adress: adress,
+      propertyType: PropertyType.apartment,
+      status: WorkRequestStatus.cancelled,
+      budget: Budget(
+        minimum: Money(minorUnits: 90000),
+        maximum: Money(minorUnits: 140000),
+      ),
+      preferredPeriod: TimeSlot(
+        startsAt: DateTime.utc(2026, 11, 2, 8),
+        endsAt: DateTime.utc(2026, 11, 13, 17),
+      ),
+      createdAt: DateTime.utc(2026, 10, 20, 19),
+      updatedAt: DateTime.utc(2026, 10, 28, 9),
     ),
   ]);
   static final List<Quote> quotes = List.unmodifiable([

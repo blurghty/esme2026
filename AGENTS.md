@@ -1,6 +1,6 @@
 # AGENTS.md — esme26
 
-Flutter app (package name `esme26`, Dart SDK `^3.13.1`) currently implementing a user onboarding/enrollment flow.
+Flutter app (package name `esme26`, Dart SDK `^3.13.1`) connecting customers and artisans: onboarding, home map and work requests (customers publish projects, artisans browse them).
 
 ## Commands
 
@@ -15,6 +15,14 @@ flutter test --plain-name "Counter increments"    # single test by name
 ```
 
 `test/widget_test.dart` exercises the onboarding flows, validation and KYC retries.
+`test/work_requests_widget_test.dart` covers the work request screens (artisan
+board, customer list, creation form, details).
+
+```bash
+# End-to-end run on an emulator/device; screenshots land in build/screenshots/
+flutter drive --driver=test_driver/integration_test.dart \
+  --target=integration_test/work_requests_test.dart -d <device-id>
+```
 
 ## Architecture
 
